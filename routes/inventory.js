@@ -10,4 +10,5 @@ router.post('/stock-in', inventoryController.stockIn);
 router.post('/sell', inventoryController.sell);
 router.get('/inventory', inventoryController.getInventory);
 
+
 module.exports = router;
