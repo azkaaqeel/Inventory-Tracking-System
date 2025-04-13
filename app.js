@@ -1,20 +1,38 @@
 //this is the main server, loads express, tells express to 
 // accept json Input and to use routes defined in routes.js
+require('dotenv').config();
 
-// 1. Import the express library
 const express = require('express');
-
-// 2. Create an Express app instance
+const cors = require('cors'); // <-- ADD THIS
 const app = express();
+//to protect API against request floods
+const rateLimit = require('express-rate-limit');
+const limiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 100, // limit each IP to 100 requests per minute
+  message: 'Too many requests, please try again later.'
+});
+app.use(limiter); // apply to all routes
 
-// 3. Let the app understand JSON in requests
+ // CORS middleware
+app.use(cors({
+  origin: 'http://localhost:3001',
+  credentials: true,
+}));
+
 app.use(express.json());
 
-// 4. Import your routes (you’ll write these in a moment)
 const inventoryRoutes = require('./routes/inventory');
-app.use('/', inventoryRoutes);
+const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/user');
+app.use('/', userRoutes); 
 
-// 5. Start the server on port 3000
+app.use('/auth', authRoutes);
+
+app.use('/', inventoryRoutes);
+app.use('/', userRoutes); 
+
+
 app.listen(3000, () => {
   console.log('Server is running on port 3000');
 });
