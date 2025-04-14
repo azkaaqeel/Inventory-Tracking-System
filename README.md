@@ -75,24 +75,34 @@ I consciously avoided overengineering and stuck with Node.js and PostgreSQL to k
 
 ---
 
-## Scalability Features
 
-| Concern              | Solution                        |
-|---------------------|----------------------------------|
-| Caching             | `node-cache` (TTL-based)         |
-| Asynchronous writes | Background `logStockMovement()` |
-| Rate-limiting       | `express-rate-limit`             |
-| Stateless APIs      | All routes stateless + JWT       |
-| DB integrity        | Foreign keys + ON CONFLICT merge|
+### Stage 3 – Scaling for Thousands of Stores
+
+To support large-scale operations, I designed the system to be horizontally scalable, performant, and concurrency-safe.
+
+#### 1. Stateless Architecture
+All API routes are stateless. I use JWT-based authentication so that each request carries its own credentials. This allows the system to scale horizontally by simply adding more server instances without session management complexity.
+
+#### 2. Caching Layer
+I integrated `node-cache` to reduce redundant database reads for frequently requested inventory data. The implementation is simple but allows easy upgrades to distributed caching tools like Redis if needed in production.
+
+#### 3. Asynchronous Processing
+Stock movement logging is done asynchronously to prevent write delays on the main request thread. This prepares the system for event-driven patterns in the future (e.g., using Kafka or RabbitMQ).
+
+#### 4. Request Throttling
+I added `express-rate-limit` to control traffic spikes and abuse. It limits clients to a fixed number of requests per time window to protect backend stability.
+
+#### 5. Database Optimization
+The PostgreSQL schema enforces referential integrity using primary and foreign keys. I also use `ON CONFLICT` logic in upsert operations to ensure safe updates under concurrent access.
+
+#### 6. Designed for Future Extensions
+Although message queues and read-replicas were not implemented due to scope, the current design allows:
+- Plug-in support for event queues (Kafka, RabbitMQ)
+- Read-write DB separation for analytics/reporting
+- Background workers for batch processing and audit reports
 
 ---
 
-## Local Setup
-
-```bash
-npm install
-node app.js
-```
 Note: Make sure PostgreSQL is running and `.env` contains DB credentials.
 
 ---
