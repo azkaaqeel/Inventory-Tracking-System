@@ -1,7 +1,7 @@
 # Inventory-Tracking-System
 
 
-This is a backend system developed as part of the Bazaar Technologies engineering case study. For each stage, I have made branches. The current main reflects the progress made for Stage 3.
+This backend system is developed as part of the Bazaar Technologies engineering case study. For each stage, I have made branches. The current main reflects the progress made for Stage 3.
 
 
 ## Key Design Decisions
